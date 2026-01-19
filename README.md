@@ -1,6 +1,6 @@
-# AegisIntelligence (AI-WebAgent) - AI 驱动的智能 Web 渗透测试进化系统
+# AegisX - AI 驱动的智能 Web 渗透测试进化系统
 
-AegisIntelligence 是一款基于 **LangGraph** 和 **LLM (大语言模型)** 构建的下一代 Web 安全自动化渗透测试代理系统。它通过多智能体协作（Multi-Agent Collaboration）和反馈驱动的策略进化，模拟资深安全专家的思维逻辑，对目标进行深度漏洞探测。
+AegisX 是一款基于 **LangGraph** 和 **LLM (大语言模型)** 构建的下一代 Web 安全自动化渗透测试代理系统。它通过多智能体协作（Multi-Agent Collaboration）和反馈驱动的策略进化，模拟资深安全专家的思维逻辑，对目标进行深度漏洞探测。
 
 ## 🌟 核心特性
 
