@@ -1,5 +1,6 @@
 import json
 import httpx
+from pathlib import Path
 from typing import List, Dict, Optional, Any
 from langchain_core.prompts import ChatPromptTemplate
 from src.config.settings import settings
@@ -26,6 +27,30 @@ class BaseVulnNodes:
             api_base=settings.OPENAI_API_BASE,
             model_kwargs={"response_format": {"type": "json_object"}}
         )
+
+    def _load_static_payloads(self, file_path: str) -> List[str]:
+        """从文件加载静态 Payload (支持相对路径自动修正)"""
+        try:
+            # 优先尝试绝对路径或相对于当前工作目录的路径
+            full_path = Path(file_path)
+            
+            # 如果不存在，尝试相对于项目根目录 (假设 src 是根目录下的文件夹)
+            if not full_path.exists():
+                # 获取当前文件所在目录的父目录的父目录 (即 src 的父目录)
+                base_dir = Path(__file__).resolve().parent.parent.parent
+                full_path = base_dir / file_path
+            
+            if full_path.exists():
+                with open(full_path, "r", encoding="utf-8") as f:
+                    payloads = [line.strip() for line in f if line.strip() and not line.startswith("#")]
+                    logger.info(f"成功从 {full_path} 加载 {len(payloads)} 个静态 Payloads")
+                    return payloads
+            else:
+                logger.warning(f"Payload 文件不存在: {file_path} (尝试路径: {full_path})")
+                return []
+        except Exception as e:
+            logger.error(f"加载 Payload 文件失败 {file_path}: {e}")
+            return []
 
     def analyze_injection_points(self, state: Dict[str, Any]) -> dict:
         """通用注入点识别：Query 参数 + Body 参数 + RESTful 路径参数"""
@@ -58,6 +83,7 @@ class BaseVulnNodes:
             "potential_points": list(set(points)),
             self.retry_key: 0,
             "test_results": [],
+            "history_results": [],
             "analysis_feedback": []
         }
 
@@ -71,7 +97,10 @@ class BaseVulnNodes:
             original_body=state.get("body"),
             original_response=state.get("response_body")
         )
-        return {"test_results": results}
+        return {
+            "test_results": results,
+            "history_results": results
+        }
 
     def _safe_json_parse(self, content: str, default_decision: str = "give_up") -> Dict[str, Any]:
         """通用的 LLM 响应 JSON 解析与错误处理"""
@@ -95,10 +124,29 @@ class BaseVulnNodes:
 
     async def _generic_strategist_node(self, state: Dict[str, Any], system_prompt: str, vuln_type: str) -> dict:
         """通用生成器节点逻辑"""
+        # 准备历史执行结果摘要 (汇总所有历史轮次)
+        history_results_summary = []
+        all_history = state.get("history_results", [])
+        
+        # 如果历史记录过多，只取最近的 30 条记录，避免上下文溢出
+        recent_history = all_history[-100:] if len(all_history) > 30 else all_history
+
+        for r in recent_history:
+            # 仅保留关键指标，减少 Token 消耗
+            history_results_summary.append({
+                "parameter": r.get("parameter"),
+                "payload": r.get("payload"),
+                "status": r.get("status"),
+                "elapsed": r.get("elapsed"),
+                "len_diff": r.get("len_diff"),
+                "similarity": r.get("similarity")
+            })
+
         user_context = {
             "url": state["target_url"],
             "points": state["potential_points"],
             "feedback": state.get("analysis_feedback"),
+            "history_results": history_results_summary,
             "full_request": {
                 "method": state["method"],
                 "url": state["target_url"],
@@ -110,7 +158,8 @@ class BaseVulnNodes:
             vuln_type=vuln_type,
             system_prompt=system_prompt,
             user_context=user_context,
-            request_id=state["request_id"]
+            request_id=state["request_id"],
+            project_name=state.get("project_name", "Default")
         )
         return {"test_results": test_cases}
 
@@ -137,7 +186,8 @@ class BaseVulnNodes:
             inputs=inputs,
             agent_name=agent_name,
             task_id=state["request_id"],
-            prompt_template=prompt
+            prompt_template=prompt,
+            project_name=state.get("project_name", "Default")
         )
         
         analysis = self._safe_json_parse(response.content)
@@ -149,20 +199,31 @@ class BaseVulnNodes:
 
         findings = []
         if is_vulnerable:
-            findings.append({
+            finding = {
+                "request_id": state["request_id"],
                 "type": findings_type,
                 "url": state["target_url"],
+                "method": state["method"],
                 "parameter": analysis.get("vulnerable_parameter"),
                 "payload": analysis.get("payload"),
                 "evidence": reasoning,
-                "original_request": {
+                "severity": "high",
+                "full_request": {
                     "method": state["method"],
                     "url": state["target_url"],
                     "headers": state["headers"],
                     "body": state.get("body")
                 }
-            })
+            }
+            findings.append(finding)
             logger.success(f"发现 {vuln_type} 漏洞! 参数: {analysis.get('vulnerable_parameter')}")
+            
+            # 存入 SQLite 数据库
+            try:
+                from src.utils.db_helper import db_helper
+                db_helper.save_vulnerability(state.get("project_name", "Default"), finding)
+            except Exception as e:
+                logger.error(f"无法将漏洞结果存入数据库: {e}")
 
         # 仅在决定重试时才增加计数器
         new_retry_count = state.get(self.retry_key, 0)

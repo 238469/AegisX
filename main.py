@@ -11,6 +11,7 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from src.core.engine.runner import TaskRunner
 from src.config.settings import settings
+from src.utils.db_helper import db_helper
 
 def setup_logging():
     """配置日志输出到文件"""
@@ -99,6 +100,12 @@ def main():
                 
     except KeyboardInterrupt:
         logger.info("\n正在停止系统...")
+        # 打印汇总信息
+        try:
+            summary = db_helper.get_session_summary()
+            print(summary)
+        except Exception as e:
+            logger.error(f"生成汇总报告失败: {e}")
     finally:
         if p_mitm.is_alive():
             p_mitm.terminate()

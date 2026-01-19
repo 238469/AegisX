@@ -28,6 +28,7 @@ class TaskRunner:
                 # 初始化 Agent 状态
                 initial_state: AgentState = {
                     "request_id": str(uuid.uuid4()),
+                    "project_name": request.get("project_name", "Default"), # 提取项目名称
                     "target_url": request["url"],
                     "method": request["method"],
                     "headers": request.get("headers", {}),
@@ -38,6 +39,7 @@ class TaskRunner:
                     "messages": [],
                     "audit_log": [],
                     "findings": [],
+                    "history_results": [],
                     "sqli_retry_count": 0,
             "xss_retry_count": 0,
             "fuzz_retry_count": 0,
@@ -52,7 +54,11 @@ class TaskRunner:
                 # 生成报告
                 findings = final_state.get("findings", [])
                 if findings:
-                    report_path = self.report_gen.generate(findings, initial_state["request_id"])
+                    report_path = self.report_gen.generate(
+                        findings, 
+                        initial_state["request_id"],
+                        initial_state.get("project_name", "Default")
+                    )
                     logger.success(f"发现漏洞！报告已生成: {report_path}")
                 else:
                     logger.info(f"未发现漏洞: {initial_state['request_id']}")

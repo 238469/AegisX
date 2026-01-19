@@ -18,13 +18,14 @@ class GenericStrategist:
             model_kwargs={"response_format": {"type": "json_object"}}
         )
 
-    def generate(self, vuln_type: str, system_prompt: str, user_context: dict, request_id: str) -> list:
+    def generate(self, vuln_type: str, system_prompt: str, user_context: dict, request_id: str, project_name: str = "Default") -> list:
         """
         通用生成方法
         :param vuln_type: 漏洞类型 (如 "SQLi", "XSS")
         :param system_prompt: 专门针对该漏洞的系统提示词
         :param user_context: 包含 url, points, original_body, feedback, full_request 等的上下文
         :param request_id: 任务 ID
+        :param project_name: 项目名称
         """
         user_prompt = "目标 URL: {url}\n待测试参数: {points}\n"
         feedback = user_context.get("feedback")
@@ -38,6 +39,11 @@ class GenericStrategist:
         else:
             feedback_str = ""
         
+        # 注入历史执行结果 (包含所有历史轮次数据，用于进化策略)
+        history_results = user_context.get("history_results")
+        if history_results:
+            user_prompt += "历史探测执行结果汇总（包含最近多轮的详细响应指标，请根据这些数据的变化趋势调整并进化你的 Payload 策略）:\n{history_results}\n"
+
         if user_context.get("full_request"):
             user_prompt += "原始完整请求上下文: {full_request}\n"
             
@@ -54,6 +60,7 @@ class GenericStrategist:
             "points": ", ".join(user_context.get("points", [])),
             "orig": user_context.get("orig", "")[:500],
             "feedback": feedback_str,
+            "history_results": json.dumps(user_context.get("history_results", []), ensure_ascii=False),
             "full_request": json.dumps(user_context.get("full_request", {}), ensure_ascii=False)
         }
         
@@ -63,7 +70,8 @@ class GenericStrategist:
                 inputs=inputs,
                 agent_name=f"{vuln_type}_Strategist",
                 task_id=request_id,
-                prompt_template=prompt
+                prompt_template=prompt,
+                project_name=project_name
             )
             
             data = json.loads(response.content)

@@ -25,7 +25,8 @@ class AuditedLLM:
                inputs: Dict[str, Any], 
                agent_name: str, 
                task_id: str, 
-               prompt_template: Optional[ChatPromptTemplate] = None) -> Any:
+               prompt_template: Optional[ChatPromptTemplate] = None,
+               project_name: str = "Default") -> Any:
         """
         同步调用并记录日志
         """
@@ -37,7 +38,8 @@ class AuditedLLM:
             agent_name=agent_name,
             task_id=task_id,
             prompt=prompt_str,
-            response=response.content if hasattr(response, 'content') else str(response)
+            response=response.content if hasattr(response, 'content') else str(response),
+            project_name=project_name
         )
         return response
 
@@ -46,7 +48,8 @@ class AuditedLLM:
                       inputs: Dict[str, Any], 
                       agent_name: str, 
                       task_id: str, 
-                      prompt_template: Optional[ChatPromptTemplate] = None) -> Any:
+                      prompt_template: Optional[ChatPromptTemplate] = None,
+                      project_name: str = "Default") -> Any:
         """
         异步调用并记录日志
         """
@@ -58,7 +61,8 @@ class AuditedLLM:
             agent_name=agent_name,
             task_id=task_id,
             prompt=prompt_str,
-            response=response.content if hasattr(response, 'content') else str(response)
+            response=response.content if hasattr(response, 'content') else str(response),
+            project_name=project_name
         )
         return response
 

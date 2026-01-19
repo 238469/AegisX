@@ -11,17 +11,18 @@ class ReportGenerator:
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
-    def generate(self, findings: List[Dict], request_id: str) -> str:
+    def generate(self, findings: List[Dict], request_id: str, project_name: str = "Default") -> str:
         """
         生成 Markdown 报告
         """
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        filename = f"report_{request_id}.md"
+        filename = f"report_{project_name}_{request_id}.md"
         filepath = os.path.join(self.output_dir, filename)
 
         md_content = f"""# 漏洞扫描报告 (Vulnerability Scan Report)
 
 **生成时间**: {timestamp}
+**项目名称**: {project_name}
 **任务 ID**: {request_id}
 
 ---

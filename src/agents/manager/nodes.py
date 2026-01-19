@@ -63,7 +63,8 @@ class ManagerAgent:
             inputs=inputs,
             agent_name="Manager",
             task_id=state["request_id"],
-            prompt_template=self.prompt
+            prompt_template=self.prompt,
+            project_name=state.get("project_name", "Default")
         )
 
         # 4. 解析任务

