@@ -91,5 +91,9 @@ class RedisHelper:
         """获取指定 Host 的历史参数列表"""
         return list(self.client.smembers(f"webagent:host:{host}:params"))
 
+    def publish_log(self, message: str):
+        """发布实时日志到 Redis Channel"""
+        self.client.publish("webagent:logs", message)
+
 # 单例模式供全局使用
 redis_helper = RedisHelper()

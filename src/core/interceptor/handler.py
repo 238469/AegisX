@@ -53,8 +53,12 @@ class InterceptorHandler:
             logger.debug(f"跳过重复请求: {flow.request.pretty_url}")
             return
 
-        # 4. 构建 InitialState 对象
+        # 4. 获取当前活跃项目名称 (从 Redis 中动态获取)
+        project_name = redis_helper.client.get("webagent:current_project") or "Default"
+
+        # 5. 构建 InitialState 对象
         task_data = {
+            "project_name": project_name,
             "url": flow.request.pretty_url,
             "method": flow.request.method,
             "headers": dict(flow.request.headers),
@@ -64,8 +68,8 @@ class InterceptorHandler:
             "fingerprint": fingerprint
         }
 
-        # 5. 持久化指纹并推送任务
+        # 6. 持久化指纹并推送任务
         redis_helper.add_fingerprint(fingerprint)
         redis_helper.push_task(task_data)
         
-        logger.info(f"已捕获并推送新任务: [{flow.request.method}] {flow.request.pretty_url}")
+        logger.info(f"已捕获并推送新任务 [{project_name}]: [{flow.request.method}] {flow.request.pretty_url}")

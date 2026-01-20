@@ -16,6 +16,22 @@ AegisX 是一款基于 **LangGraph** 和 **LLM (大语言模型)** 构建的下�
   - 基于 SQLite 的项目化存储，记录所有漏洞详情、原始请求/响应包。
   - 完整的 Agent 对话日志审计，确保测试过程可追溯。
 
+## 🛠️ 扩展 AI 工具箱
+
+系统内置了丰富的 AI 可调用工具，赋予 Agent 强大的实战能力：
+
+- **🌐 HTTP/HTTPS 请求执行器**：
+  - 支持完整的 HTTP 协议交互，自动处理 Host 头和 HTTPS 握手。
+  - 集成 **系统代理 (System Proxy)**，确保流量可控。
+- **🐍 Code Interpreter (代码解释器)**：
+  - 提供安全的 Python 代码执行沙箱，Agent 可编写脚本进行复杂计算或逻辑验证。
+- **🔍 Web Search (联网搜索)**：
+  - 集成 DuckDuckGo 搜索能力，支持实时获取互联网信息和最新漏洞情报。
+- **💣 POC Library (漏洞情报库)**：
+  - 直接对接漏洞情报库 (如 rss.biu.life)，支持按标签搜索实战 POC 代码。
+- **📡 CEYE Verify (OOB 验证)**：
+  - 集成 CEYE API，自动检测和验证 DNS/HTTP 带外请求 (Blind RCE/SSRF)。
+
 ## 🏗️ 系统架构
 
 - **Manager Agent**：任务分发与状态管理核心。
@@ -129,12 +145,32 @@ OPENAI_API_BASE=https://api.openai.com/v1
 MODEL_NAME_MANAGER=gpt-4o
 MODEL_NAME_WORKER=gpt-4o-mini
 REDIS_URL=redis://localhost:6379/0
+# 可选配置
+SCAN_PROXY=http://127.0.0.1:8080  # 系统扫描代理
+CEYE_API_TOKEN=your_token_here    # CEYE OOB 验证 Token
+CEYE_IDENTIFIER=your_id.ceye.io   # CEYE Identifier
 ```
 
-### 3. 启动扫描
+### 3. 启动系统
+
+本项目采用前后端分离架构，需分别启动后端服务和前端界面。
+
+#### 3.1 启动后端 (API & Engine)
 ```bash
 python main.py
 ```
+后端服务将在 `http://localhost:8000` 启动，包含：
+- FastAPI 接口服务
+- Agent 扫描引擎
+- Mitmproxy 流量监听 (默认端口 8080)
+
+#### 3.2 启动前端 (Web UI)
+```bash
+cd frontend
+npm install
+npm run dev
+```
+前端界面将在 `http://localhost:5173` 启动。请在浏览器中访问此地址以使用图形化界面管理扫描任务和查看报告。
 
 ## 📊 数据存储
 漏洞结果和 Agent 日志将存储在 `data/webagent.db` 中。您可以通过项目名称查询特定的扫描记录。

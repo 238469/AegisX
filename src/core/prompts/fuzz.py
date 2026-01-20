@@ -41,9 +41,9 @@ FUZZ_GENERATOR_PROMPT = """你是一个高级 Web Fuzzing 专家。请根据目�
      - **联合参数**：`id=1,2` 或 `id[]=1&id[]=2`（测试数组解析）。
 
 3. 占位符处理（强制规则）：
-   - 必须保留 'points' 中的 '{{PAYLOAD}}' 占位符结构。
+   - 必须保留 'points' 中的 '{{{{PAYLOAD}}}}' 占位符结构。
    - **关键技巧**：利用“参数拼接”来实现参数注入。
-     - 假设当前点是 `id={{PAYLOAD}}`，你可以生成 Payload `1&debug=true`，最终请求变成 `id=1&debug=true`，从而成功注入 `debug` 参数。
+     - 假设当前点是 `id={{{{PAYLOAD}}}}`，你可以生成 Payload `1&debug=true`，最终请求变成 `id=1&debug=true`，从而成功注入 `debug` 参数。
      - 这是目前架构下实现“新增参数”的最佳方式。
 
 4. 输出格式：

@@ -12,9 +12,17 @@ def create_xss_graph():
     builder.add_node("executor", nodes.executor_node)
     builder.add_node("final_analyzer", nodes.analyzer_node)
 
+    # 条件边：如果在初始化阶段未发现注入点，直接结束
+    def route_after_init(state: XSSState):
+        if not state.get("potential_points"):
+            from loguru import logger
+            logger.info("未识别到潜在注入点，XSS 扫描提前结束。")
+            return END
+        return "strategist"
+
     # 编排流程
     builder.set_entry_point("analyzer")
-    builder.add_edge("analyzer", "strategist")
+    builder.add_conditional_edges("analyzer", route_after_init)
     builder.add_edge("strategist", "executor")
     builder.add_edge("executor", "final_analyzer")
 

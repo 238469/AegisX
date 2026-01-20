@@ -37,7 +37,10 @@ class Settings(BaseSettings):
 
     # 存储配置
     REDIS_URL: str = Field(default="redis://localhost:6379/0", description="Redis 连接地址")
-    POSTGRES_URL: str = Field(default="postgresql://user:pass@localhost:5432/db", description="PostgreSQL 连接地址")
+
+    # OOB (带外) 验证配置
+    CEYE_API_TOKEN: Optional[str] = Field(default=None, description="CEYE API Token")
+    CEYE_IDENTIFIER: Optional[str] = Field(default=None, description="CEYE Identifier (e.g., xxxx.ceye.io)")
 
     # 日志配置
     LOG_LEVEL: str = Field(default="INFO", description="日志级别")

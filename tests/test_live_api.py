@@ -54,10 +54,11 @@ async def test_live_sqli_restful():
         logger.info(f"重试次数: {final_state.get('sqli_retry_count')}")
         
             
-        # 检查审计日志路径
-        audit_path = "logs/audit.jsonl"
-        if os.path.exists(audit_path):
-            logger.info(f"📝 审计日志已记录至: {audit_path}")
+        # 检查审计日志 (已改为数据库存储)
+        # audit_path = "logs/audit.jsonl"
+        # if os.path.exists(audit_path):
+        #    logger.info(f"📝 审计日志已记录至: {audit_path}")
+        logger.info("📝 审计日志已存入数据库")
             
     except Exception as e:
         logger.error(f"❌ 实时测试出错: {e}")

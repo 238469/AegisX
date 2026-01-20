@@ -38,8 +38,8 @@ SQLI_GENERATOR_PROMPT = """你是一个 SQL 注入渗透测试专家。请根据
      - 提交按钮名称 (submit=Login)。
 
 3. 占位符处理（强制规则）：
-   - 必须保留 'points' 中的 '{{PAYLOAD}}' 占位符结构。
-   - 例如输入 'http://site.com/path/{{PAYLOAD}}'，输出必须是 'http://site.com/path/{{PAYLOAD}}'，严禁简化为 'path'。
+   - 必须保留 'points' 中的 '{{{{PAYLOAD}}}}' 占位符结构。
+   - 例如输入 'http://site.com/path/{{{{PAYLOAD}}}}'，输出必须是 'http://site.com/path/{{{{PAYLOAD}}}}'，严禁简化为 'path'。
 
 4. 动态策略调整（基于 Feedback）：
    - **如果 feedback 指示 WAF 拦截**（403, "Malicious"）：

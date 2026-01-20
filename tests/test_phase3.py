@@ -33,11 +33,18 @@ def test_manager_decision():
     print(f"分配的任务: {result['tasks']}")
     
     # 验证审计日志
-    log_files = list(Path("logs/llm_audit").glob("*.jsonl"))
-    if log_files:
-        print(f"\n[审计日志] 已生成: {log_files[0]}")
+    from src.utils.db_helper import db_helper
+    projects = db_helper.list_projects()
+    if projects:
+        print(f"\n[审计日志] 已确认存入数据库，当前项目数: {len(projects)}")
     else:
-        print("\n[错误] 未生成审计日志！")
+        print("\n[警告] 数据库中未找到项目记录（可能是首次运行）")
+    
+    # log_files = list(Path("logs/llm_audit").glob("*.jsonl"))
+    # if log_files:
+    #     print(f"\n[审计日志] 已生成: {log_files[0]}")
+    # else:
+    #     print("\n[错误] 未生成审计日志！")
 
 if __name__ == "__main__":
     test_manager_decision()

@@ -29,13 +29,11 @@ class ManagerAgent:
 - **fuzz**: **参数与值模糊测试**。专注于发现隐藏参数（Parameter Discovery）和枚举敏感业务值（Value Fuzzing）。任何看似重要的接口（如支付、权限、查询），或者可能存在隐藏参数时，都**必须**包含 fuzz 任务。
 
 决策原则（支持多任务并发）：
-- 如果一个请求既有 ID 参数（可能 SQLi），又有回显参数（可能 XSS），同时业务逻辑复杂（需要 Fuzz），请**同时输出**这三者。
-- 不要犹豫，宁可多测不可漏测。
+- 如果一个请求（可能 SQLi），（可能 XSS），（需要 Fuzz），请**同时输出**这三者。
 
 输出要求：
 1. 仅输出漏洞类型列表，用逗号分隔（如: sqli,fuzz,xss）。
-2. 如果认为不存在漏洞风险，输出 'none'。
-3. 即使请求没有参数，也要关注请求头注入的可能性。"""),
+2. 如果认为不存在漏洞风险，输出 'none'。"""),
             ("user", "### Request\nMethod: {method}\nURL: {url}\nHeaders: {headers}\nBody: {body}\n\n### Response (Context)\nHeaders: {res_headers}\nBody: {res_body}")
         ])
 

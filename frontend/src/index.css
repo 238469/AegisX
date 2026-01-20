@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-slate-200;
+  }
+}
+
+.terminal-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.terminal-scrollbar::-webkit-scrollbar-track {
+  @apply bg-slate-900;
+}
+
+.terminal-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-slate-700 rounded;
+}
+
+.terminal-scrollbar::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-600;
+}

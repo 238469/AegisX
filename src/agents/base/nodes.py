@@ -78,7 +78,7 @@ class BaseVulnNodes:
             if part.isdigit() or (len(part) > 30 and "-" in part):
                 placeholder = "/".join(path_parts[:i] + ["{{PAYLOAD}}"] + path_parts[i+1:])
                 points.append(placeholder)
-                
+        logger.info(f"识别到 {len(points)} 个潜在注入点: {points}")
         return {
             "potential_points": list(set(points)),
             self.retry_key: 0,

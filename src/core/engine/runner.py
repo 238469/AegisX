@@ -6,7 +6,6 @@ from loguru import logger
 from src.utils.redis_helper import RedisHelper
 from src.agents.manager.graph import graph
 from src.agents.manager.state import AgentState
-from src.core.report_generator import ReportGenerator
 from src.config.settings import settings
 
 class TaskRunner:
@@ -16,7 +15,6 @@ class TaskRunner:
     def __init__(self):
         self.redis = RedisHelper()
         self.queue_key = "webagent:tasks:initial"
-        self.report_gen = ReportGenerator()
         # 引入信号量限制并发任务数
         self.semaphore = asyncio.Semaphore(settings.SCAN_MAX_TASKS)
         logger.info(f"TaskRunner 初始化成功，最大并发任务数: {settings.SCAN_MAX_TASKS}")
@@ -51,15 +49,9 @@ class TaskRunner:
                 # 驱动 LangGraph 异步运行
                 final_state = await graph.ainvoke(initial_state)
                 
-                # 生成报告
                 findings = final_state.get("findings", [])
                 if findings:
-                    report_path = self.report_gen.generate(
-                        findings, 
-                        initial_state["request_id"],
-                        initial_state.get("project_name", "Default")
-                    )
-                    logger.success(f"发现漏洞！报告已生成: {report_path}")
+                    logger.success(f"发现漏洞！任务 ID: {initial_state['request_id']}")
                 else:
                     logger.info(f"未发现漏洞: {initial_state['request_id']}")
                 

@@ -14,7 +14,6 @@ class LLMAuditor:
 
     def record(self, agent_name: str, task_id: str, prompt: any, response: any, project_name: str = "Default"):
         """记录单次交互"""
-        log_file = self.log_path / f"{datetime.now().strftime('%Y-%m-%d')}.jsonl"
         
         entry = {
             "timestamp": datetime.now().isoformat(),
@@ -25,12 +24,12 @@ class LLMAuditor:
             "response": str(response)
         }
         
-        # 1. 写入 JSONL 文件 (保留原始文件记录习惯)
-        try:
-            with open(log_file, "a", encoding="utf-8") as f:
-                f.write(json.dumps(entry, ensure_ascii=False) + "\n")
-        except Exception as e:
-            logger.error(f"无法写入 LLM 审计日志文件: {e}")
+        # 1. 写入 JSONL 文件 (已禁用，仅写入数据库)
+        # try:
+        #     with open(log_file, "a", encoding="utf-8") as f:
+        #         f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+        # except Exception as e:
+        #     logger.error(f"无法写入 LLM 审计日志文件: {e}")
 
         # 2. 写入 SQLite 数据库 (新增)
         try:
