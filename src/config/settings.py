@@ -35,6 +35,16 @@ class Settings(BaseSettings):
             return v
         return []
 
+    @field_validator("SCAN_PROXY", mode="before")
+    @classmethod
+    def parse_proxy(cls, v: Any) -> Optional[str]:
+        if v is None:
+            return None
+        s = str(v).strip()
+        if not s or s.lower() == "none":
+            return None
+        return s
+
     # 存储配置
     REDIS_URL: str = Field(default="redis://localhost:6379/0", description="Redis 连接地址")
 

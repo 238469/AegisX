@@ -34,3 +34,6 @@ reports/
 .vscode/
 .idea/
 .DS_Store
+
+# Testing
+tests/
